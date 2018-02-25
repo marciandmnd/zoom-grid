@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Zoom Grid</title>
+  <style>
+    .grid-wrapper {
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <!-- <svg height="100%" width="100%" id="outer">
+    <circle id="inner" cx="25" cy="20" r="20" fill="orange"/> 
+  </svg> -->
+  <div class='grid-wrapper'>
+    <canvas id="c-grid"></canvas>
+  </div>
+  <script>
+    var gridSettings = {
+      cellWidth: 40
+    };
+
+    function fitToContainer(canvas){
+      // Make it visually fill the positioned parent
+      canvas.style.width ='100%';
+      canvas.style.height='100%';
+      // ...then set the internal size to match
+      canvas.width  = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    }
+
+    function zoomIn() {
+      gridSettings.cellWidth += 10;
+      drawGrid();
+    }
+
+    function zoomOut() {
+      if(gridSettings.cellWidth > 5) {
+        gridSettings.cellWidth -= 5;
+        drawGrid();
+      }
+    }
+
+    // Alternative approach for zoom using transform: 
+    // function zoom() {
+    //     var circle = document.getElementById('inner');
+    //     circle.setAttribute("transform", "scale(1.5)");
+    // }
+    // setTimeout(zoom, 2000);
+
+    var canvas = document.getElementById('c-grid');
+
+    fitToContainer(canvas);
+
+    canvas.addEventListener("wheel", function(e) {
+      e.preventDefault();
+      if (e.deltaY < 0) {
+        console.log('scrolling up');
+        zoomIn();
+      }
+      if (e.deltaY > 0) {
+        console.log('scrolling down');
+        zoomOut();
+      }
+    });
+
+    function drawGrid() {
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+
+      var context = canvas.getContext("2d");
+      window.ctx = context;
+      console.log('ctx', context);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      
+      context.beginPath();
+      for(var x = 0.5; x < w; x += gridSettings.cellWidth) {
+        context.moveTo(x, 0);
+        context.lineTo(x, h);
+      }
+        
+      for(var y = 0.5; y < h; y += gridSettings.cellWidth) {
+        context.moveTo(0, y);
+        context.lineTo(w, y);
+      }
+      context.strokeStyle = "#000";
+      context.stroke();
+      context.closePath();
+    }
+
+    drawGrid();
+  </script>
+</body>
+</html>
